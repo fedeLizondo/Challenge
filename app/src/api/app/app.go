@@ -3,12 +3,13 @@ package app
 import (
 	"api/app/items"
 	"database/sql"
-	"os"
+//	"os"
 	"time"
-
+  "fmt"
 	"github.com/gin-gonic/gin"
 	// Needed to sql lite 3
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
+  _ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -28,12 +29,10 @@ func StartApp() {
 }
 
 func configDataBase() *sql.DB {
-	os.Remove("./foo.db")
-	db, err := sql.Open("sqlite3", "./foo.db")
-	//db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", "user", "userpwd", "db", "db"))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8", "user", "userpwd", "db", "db"))
 	if err != nil {
 		panic("Could not connect to the db")
-	} 
+	}
 
 	for {
 		err := db.Ping()
@@ -52,9 +51,9 @@ func createTable(db *sql.DB) {
 	// create table if not exists
 	sql_table := `
 	CREATE TABLE IF NOT EXISTS items(
-		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		name TEXT,
-		description TEXT
+		id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(255),
+		description VARCHAR(255)
 	);`
 	_, err := db.Exec(sql_table)
 	if err != nil {

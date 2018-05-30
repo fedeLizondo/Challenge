@@ -9,6 +9,8 @@ services:
 
   app:
     build: app
+    volumes:
+      - ./app/src/api:/go/src/api
     expose:
       - "8080"
 
