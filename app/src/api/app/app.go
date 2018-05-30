@@ -33,7 +33,6 @@ func configDataBase() *sql.DB {
 	if err != nil {
 		panic("Could not connect to the db")
 	}
-
 	for {
 		err := db.Ping()
 		if err != nil {
