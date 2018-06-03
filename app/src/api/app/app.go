@@ -25,7 +25,7 @@ func StartApp() {
 	r = gin.Default()
 	db := configDataBase()
 	items.Configure(r, db)
-	files.Configure( r )
+	items.ConfigureForFiles( r )
 	r.Run(port)
 }
 

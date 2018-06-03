@@ -3,8 +3,17 @@ package items
 import (
 	"net/http"
 	"strings"
-	"os"
+	//"os"
 	"api/app/models"
+	"fmt"
+	"io/ioutil"
+	"os"
+
+	_"golang.org/x/net/context"
+	_"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v3"
+	//"google.golang.org/api/googleapi"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,12 +53,12 @@ func PostItem(c *gin.Context) {
 //Search For File then for word
 func SearchForFile(c *gin.Context)  {
 	fileId := strings.TrimSpace(c.Param("id"))
-	if fileName == "" {
+	if fileId == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "id_error"})
 		return
 	}
 	word := strings.TrimSpace(c.DefaultQuery("word",""))
-	if fileName == "" {
+	if word == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "word_error"})
 		return
 	}
@@ -59,6 +68,10 @@ func SearchForFile(c *gin.Context)  {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read server secret file", "description": err.Error()})
 		return
 	}
+
+	f,_ = os.Create("DespuesDeLeerJson.txt")
+	defer f.Close()
+
 	// If modifying these scopes, delete your previously saved client_secret.json.
 	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
@@ -66,14 +79,20 @@ func SearchForFile(c *gin.Context)  {
 		return
 	}
 
+	f,_ := os.Create("DespuesConfigurargoogle.txt")
+	defer f.Close()
+
 	srv, err := drive.New(getClient(config))
+	f,_ = os.Create("DespuesDeLeerJson.txt")
+	defer f.Close()
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to retrieve Drive client", "description": err.Error()})
 		return
 	}
-
-	r, err := srv.Files.get(fileId).List().
-		Fields( fmt.Sprintf("fullText contains %s , nextPageToken, files(id, name)",word)).Do()
+//fields := fmt.Sprintf("fullText contains %s , nextPageToken, files(id, name)",word)
+	r, err := srv.Files.List().Do()
+		//Fields( fields ).Do()
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found files", "description": err.Error()})
 		return
@@ -113,10 +132,7 @@ func PostFile(c *gin.Context) {
 		return
 	}
 
-	f:=&drive.File{
-		Name: i.Title,
-		Description: i.Description
-	}
+	f := &drive.File{ Name: i.Title, Description: i.Description }
 
 	srv, err := drive.New(getClient(config))
 	if err != nil {
@@ -124,16 +140,20 @@ func PostFile(c *gin.Context) {
 		return
 	}
 
-	r, err := srv.Files.Create(f).PageSize(10).Do()
+  file,err := ioutil.TempFile("",i.Title)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to retrieve files", "description": err.Error()})
 		return
 	}
 
+	//baseMimeType := "text/plain"
+	r, err := srv.Files.Create(f).Media(file).Do()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "save_error", "description": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to retrieve files", "description": err.Error()})
 		return
 	}
+
+	i.ID = r.Id
 
 	c.JSON(http.StatusOK, i)
 }
