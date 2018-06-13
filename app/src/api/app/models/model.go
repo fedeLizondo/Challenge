@@ -7,12 +7,6 @@ type Item struct {
 	Description string `json:"description"`
 }
 
-type File struct{
-	ID          string `json:"id"`
-	Title       string `json:"titulo"`
-	Description string `json:"descripcion"`
-}
-
 // ItemServiceInterface ...
 type ItemServiceInterface interface {
 	Item(id string) (*Item, error)

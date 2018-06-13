@@ -3,13 +3,15 @@ package app
 import (
 	"api/app/items"
 	"database/sql"
-//	"os"
+
+	//	"os"
+	"fmt"
 	"time"
-  "fmt"
+
 	"github.com/gin-gonic/gin"
 	// Needed to sql lite 3
 	//_ "github.com/mattn/go-sqlite3"
-  _ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -24,8 +26,15 @@ const (
 func StartApp() {
 	r = gin.Default()
 	db := configDataBase()
+	// data := []byte("state")
+	// sessionName := "goquestsession"
+	// google.Setup("http://localhost:8080/callback", "./client_secret.json", []string{"https://www.googleapis.com/auth/drive"}, data)
+	//
+	// r.Use(google.Session(sessionName))
+	//
+	// r.Use(google.Auth())
 	items.Configure(r, db)
-	items.ConfigureForFiles( r )
+	items.ConfigureForFiles(r)
 	r.Run(port)
 }
 
@@ -37,7 +46,7 @@ func configDataBase() *sql.DB {
 	for {
 		err := db.Ping()
 		if err != nil {
-			time.Sleep(1*time.Second)
+			time.Sleep(1 * time.Second)
 			continue
 		}
 		// This is bad practice... You should create a schema.sql with all the definitions
