@@ -13,21 +13,29 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	//_ "google.golang.org/api/drive/v3"
+	drive "google.golang.org/api/drive/v3"
 )
 
 var (
 	googleOauthConfig *oauth2.Config = &oauth2.Config{
-		RedirectURL: "http://localhost:8080/callback",
-		Scopes:      []string{"https://www.googleapis.com/auth/drive"},
-		Endpoint:    google.Endpoint,
+		RedirectURL:  "http://localhost:8080/callback",
+		ClientID:     "265169521968-cdu9f25cbim1qa86c4lidnv44dffhti0.apps.googleusercontent.com", // os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: "ls6bFVb9Xqpj_f9vKz12vNpk",                                                 //os.getEnv("GOOGLE_CLIENT_SECRET"),
+		Scopes:       []string{"https://www.googleapis.com/auth/drive"},
+		Endpoint:     google.Endpoint,
 	}
 )
 
 func AuthDriveApi() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
+		//GENERAR UNA CLAVE RANDOM Y GUARDAR EN UNA session
+		claveGeneradaRandom := "state"
+		//SESSION guardo el context (?) o guardo el request
+		//NECESITO GUARDAR EL POST Y EL JSON(O EL OBJETO) Y EL GET
+
 		conf := googleOauthConfig
-		url := conf.AuthCodeURL("stateBLABLA", oauth2.AccessTypeOffline)
+		url := conf.AuthCodeURL(claveGeneradaRandom, oauth2.AccessTypeOffline)
 		c.Redirect(http.StatusTemporaryRedirect, url)
 
 	}
@@ -50,7 +58,7 @@ func callback(c *gin.Context) {
 	}
 
 	client := googleOauthConfig.Client(oauth2.NoContext, tok)
-	if client != nil {
+	if client == nil {
 		c.JSON(http.StatusBadRequest, "ERROR obteniendo el cliente")
 		return
 	}
@@ -65,10 +73,12 @@ func SearchForFile(c *gin.Context) {
 		return
 	}
 	word := strings.TrimSpace(c.Param("word"))
-
+	if word != "" {
+		word = word
+	}
 	//CODIGO DEL HANDLER
 	conf := googleOauthConfig
-	url := conf.AuthCodeURL("stateBLABLA", oauth2.AccessTypeOffline)
+	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 	return
 
@@ -114,14 +124,32 @@ func SearchForFile(c *gin.Context) {
 // PostFile ...
 func PostFile(c *gin.Context) {
 	i := &models.File{}
-	// 	if err := c.BindJSON(i); c.Request.ContentLength == 0 || err != nil {
-	// 		c.JSON(http.StatusBadRequest, gin.H{"error": "bind_error", "description": err.Error()})
-	// 		return
-	// 	}
-	// 	//err := Is.CreateFile(i)
-	// 	if err != nil {
-	// 		c.JSON(http.StatusBadRequest, gin.H{"error": "save_error", "description": err.Error()})
-	// 		return
-	// 	}
-	c.JSON(201, i)
+	if erro := c.BindJSON(i); c.Request.ContentLength == 0 || erro != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error en los parametros", "description": erro.Error()})
+		return
+	}
+
+	client, ok := c.Get("client")
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ERROR obteniendo el cliente de drive", "description": ""})
+		return
+	}
+
+	srv, err := drive.New(client.(*http.Client))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ERROR obteniendo el cliente de drive", "description": err.Error()})
+		return
+	}
+
+	file := &drive.File{Name: i.Title, Description: i.Description, MimeType: "text/plain"}
+
+	resp, err := srv.Files.Create(file).Do()
+	if err != nil || resp == nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	i.ID = resp.Id
+	c.JSON(http.StatusOK, i)
+	return
 }
