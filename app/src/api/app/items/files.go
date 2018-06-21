@@ -7,7 +7,7 @@ import (
 // Configure for files
 func ConfigureForFiles(r *gin.Engine) {
 	//r.Use(AuthGoogle())
-	r.GET("/search-in-doc/:id", SearchForFile)
-	r.POST("/file", PostFile)
+	r.GET("/search-in-doc/:id", AuthDriveApi(), SearchForFile)
+	r.POST("/file", AuthDriveApi(), PostFile)
 	r.GET("callback", callback)
 }

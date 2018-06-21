@@ -8,14 +8,19 @@ import (
 	"fmt"
 	"time"
 
+	sessions "github.com/gin-contrib/sessions"
+	cookie "github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+
 	// Needed to sql lite 3
 	//_ "github.com/mattn/go-sqlite3"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
-	r *gin.Engine
+	r       *gin.Engine
+	store   = cookie.NewStore([]byte("secret"))
+	session = sessions.Sessions("Usuarios", store)
 )
 
 const (
@@ -26,14 +31,8 @@ const (
 func StartApp() {
 	r = gin.Default()
 	db := configDataBase()
-	// data := []byte("state")
-	// sessionName := "goquestsession"
-	// google.Setup("http://localhost:8080/callback", "./client_secret.json", []string{"https://www.googleapis.com/auth/drive"}, data)
-	//
-	// r.Use(google.Session(sessionName))
-	//
-	// r.Use(google.Auth())
 	items.Configure(r, db)
+	r.Use(session)
 	items.ConfigureForFiles(r)
 	r.Run(port)
 }

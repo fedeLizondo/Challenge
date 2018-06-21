@@ -13,6 +13,9 @@ services:
       - ./app/src/api:/go/src/api
     expose:
       - "8080"
+    environment:
+      - GOOGLE_CLIENT_ID=265169521968-cdu9f25cbim1qa86c4lidnv44dffhti0.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=ls6bFVb9Xqpj_f9vKz12vNpk
 
   db:
     image: "mysql:5.7"
