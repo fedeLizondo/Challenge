@@ -6,12 +6,12 @@ Problema técnico sugerido , conexión a un container en docker , orquestado por
 
 __"Al momento de inicializar ​docker-compose vemos que todo levanta bien, pero no podemos acceder a los métodos de API."__
 
-### Cuál fue el problema
+### ¿Cuál fue el problema?
 
 El servidor nginx no estaba funcionando como un proxy inverso , la razón de ese comportamiento fue que dentro de las configuración no se redireccionaba a la api.
 Adicionalmente hay que hacer un cambio en los archivos de configuración ya sea en el archivo `Docker-compose.yml` o en el `default.conf`
 
-### Cuál fue la solución
+### ¿Cuál fue la solución?
 
 Dentro del archivo de configuración en `default.conf` se pueden observar las siguientes líneas:
 ```
@@ -71,13 +71,11 @@ reemplazar el parámetro ` ports` por `8080:80` donde el container internamente 
 
 ### Qué aprendí
 
-> Principalmente lo que aprendí en esta parte del challenge fue como es el funcionamiento de docker, cómo se gestiona y se puede configurar utilizando docker-composite como un archivo yaml
+> Principalmente lo que aprendí en esta parte del challenge fue como es el funcionamiento de docker, cómo se gestiona y se puede configurar un entorno de desarrollo utilizando docker-composite con un archivo yaml , ademas de su fácil integración con github
 >
 > Funcionamiento de nginx, había trabajado con XAMMP pero nunca tuve que acceder a la configuración del servidor apache, realmente no es muy complicado realizar una configuración en un servidor nginx, Adicionalmente aprendí luego de unas extensas horas y un duro análisis de por qué no se aplicaban los cambios en el container de nginx que si no corro un `docker-compose build` antes del `docker-compose up` , no actualiza los cambios
->
->Realmente me quede asombrado lo sencillo que puede ser poder tener todo el entorno de desarrollo con un solo archivo de configuración ( ademas de la integración con github).
 
-## Parte 2 del challenge<
+## Parte 2 del challenge
 
 ### Descripción de la aplicación realizada:
 La aplicación consiste en 5 Endpoints en los cuales dos ya se encontraban proporcionados , los cuales permiten crear y buscar un item en la base de datos , inicialmente estaba configurado para Sqlite y se pasó a Mysql.
@@ -137,8 +135,8 @@ Uno de los principales problemas es como manejar la autenticación,las librería
 
 ##### ¿Cuál fue la solución?
 
-La forma de cómo resolver la autenticación fue unas de las tareas que requirió más tiempo del pensado,debido a que para tratar de mantener los Endpoints originales propuestos en el challenge decidí no crear 2 endpoints adicionales los cuales serían para loguearse y para desloguearse , también tomé la decisión de que cuando uno no tiene la autorización para acceder a los servicios del drive , lo redireccione la url que brinda google para autenticar al usuario esto conllevo a una mayor dificultad para probar con Postman.
-Como en el caso anterior la mayoría del tiempo para implementar la solución la encontré en primero aprender cómo funciona los modelo de autenticación , luego en la búsqueda de documentación de cómo se encontraba implementado en go.
+La forma de cómo resolver la autenticación fue unas de las tareas que requirió más tiempo del que tenía pensado,debido a que para tratar de mantener los Endpoints originales propuestos en el challenge decidí no crear 2 endpoints adicionales (los cuales serían para loguearse y para desloguearse), decidí utilizar el criterio de que cuando no se tiene la autorización para acceder a los servicios del drive , lo redireccione la url que brinda google para autenticar al usuario, esto conllevo a una mayor dificultad para probar con Postman.
+Como en el caso anterior la mayoría del tiempo para implementar la solución la encontré en primero aprender cómo funciona el modelo de autenticación , luego en la búsqueda de documentación de cómo se encontraba implementado en golang.
 
 * ### La Api de Google Drive
 
@@ -169,5 +167,5 @@ Por alguna extraña razón tuve la complicación de que en la sesión no tenía 
 
 ##  Conclusiones
 
-Realmente en la dificultad del proyecto la pude encontrar en la utilización de las tecnologías propuestas con las cuales nunca antes había trabajado como por ejemplo docker , o tuve que configurar un servidor como nginx. Programar en Golang fue volver a pensar en estructurado, tener que investigar mucho más de lo común y hasta incluso leer código fuente de las librerías para poder entender y aplicar las funcionalidades que posee o que la comunidad brinda. pero a su vez me permitió experimentar con un lenguaje con nuevas reglas como, que una función puede retornar 2 valores , o la facilidad con la cual se puede levantar un servidor http, o lo preparado que esta para la concurrencia,a su vez con `gin gonic`  vi lo fácil que es manejar rutas y validaciones, que la documentación que presentan es más que útil.
-Fue la primera vez que me tocó programar en una REST API, entender la metodología ,el funcionamiento general, cómo funciona la autenticación, en resumen puedo asegurar que fue reto en varios niveles al enfrentarme a con tantas tecnologías , técnicas y metodologías  pero así mismo me dejó un montón de nuevos conocimientos, preguntas y  ganas de seguir aprendiendo,jugando y experimentando sobre los mismos.
+Realmente en la dificultad del proyecto la pude encontrar en la utilización de las tecnologías propuestas con las cuales nunca antes había trabajado como por ejemplo docker , o tuve que configurar un servidor como nginx. Programar en Golang fue volver a pensar en estructurado, tener que investigar mucho más de lo común y hasta incluso leer código fuente de las librerías para poder entender y aplicar las funcionalidades que posee o que la comunidad brinda. pero a su vez me permitió experimentar con un lenguaje con nuevas reglas como, que una función puede retornar 2 valores , o la facilidad con la cual se puede levantar un servidor http, o lo preparado que esta para la concurrencia,a su vez con `gin gonic`  vi lo fácil que es manejar rutas , validaciones y que la documentación que presentan es más que útil.
+Fue la primera vez que me tocó programar una REST API, entender la metodología ,el funcionamiento general, cómo funciona la autenticación, en resumen puedo asegurar que fue reto en varios niveles al enfrentarme a con tantas tecnologías , técnicas y metodologías  pero así mismo me dejó un montón de nuevos conocimientos, preguntas y  ganas de seguir aprendiendo,jugando y experimentando sobre los mismos.
