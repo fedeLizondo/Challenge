@@ -93,12 +93,14 @@ func getDriveApiService(session sessions.Session, tokenKey string) (*drive.Servi
 	dataToken := session.Get(tokenKey)
 	if dataToken == nil {
 		session.Delete(cliente)
+		session.Save()
 		return nil, errors.New("No se puede obtener el token")
 	}
 
 	token := dataToken.(string)
 	if token == "" {
 		session.Delete(cliente)
+		session.Save()
 		return nil, errors.New("El token se encuentra vacio")
 	}
 
@@ -110,11 +112,15 @@ func getDriveApiService(session sessions.Session, tokenKey string) (*drive.Servi
 
 	client := googleOauthConfig.Client(oauth2.NoContext, tok)
 	if client == nil {
+		session.Delete(cliente)
+		session.Save()
 		return nil, errors.New("No se puede obtener el cliente")
 	}
 
 	driveService, err := drive.New(client)
 	if err != nil {
+		session.Delete(cliente)
+		session.Save()
 		return nil, errors.New("No se puede obtener el Drive.Service* de drive " + err.Error())
 	}
 
